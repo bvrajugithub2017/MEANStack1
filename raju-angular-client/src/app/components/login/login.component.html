@@ -1,0 +1,45 @@
+<h1 class="page-header">Login</h1>
+
+<div class="row show-hide-message">
+  <div [ngClass]="rajuBootstrapClass">
+    {{rajuResponseMessage}}
+  </div>
+</div>
+
+<form [formGroup]="rajuFormGroup" (submit)="onLoginSubmit()"> 
+
+  <!-- Username Input -->
+  <div class="form-group">
+    <label for="username">Username</label>
+    <div [ngClass]="{
+                  'has-error': rajuFormGroup.controls.username.errors && rajuFormGroup.controls.username.dirty,
+                  'has-success': rajuFormGroup.controls.username.valid && rajuFormGroup.controls.username.dirty}">
+      <input type="text" name="username" formControlName="username" class="form-control"/>
+       <!-- Validation -->
+       <ul class="help-block">
+        <li *ngIf="rajuFormGroup.controls.username.errors?.required && rajuFormGroup.controls.username.dirty">
+          This field is required</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Password Input -->
+  <div class="form-group">
+    <label for="password">Password</label>
+    <div [ngClass]="{
+      'has-error': rajuFormGroup.controls.password.errors && rajuFormGroup.controls.password.dirty, 
+      'has-success': rajuFormGroup.controls.password.valid && rajuFormGroup.controls.password.dirty}">
+      <input type="password" name="password" formControlName="password" class="form-control" />
+      <!-- Validation -->
+      <ul class="help-block">
+          <li *ngIf="rajuFormGroup.controls.password.errors?.required && rajuFormGroup.controls.password.dirty">
+            This field is required</li>
+      </ul>
+    </div>
+  </div>
+
+  <input [disabled]="!rajuFormGroup.valid || rajuProcessing"  type="submit" class="btn btn-primary" value="Login" />
+
+</form>
+<!-- End of Login Form -->
+

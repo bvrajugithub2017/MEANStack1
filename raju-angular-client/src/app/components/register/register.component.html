@@ -1,0 +1,114 @@
+<h1 class="page-header">Registration Page</h1>
+
+<!-- Showing the response after the user clicks on "Submit" of Registration page -->
+<div class="row show-hide-message">
+  <div [ngClass]="rajuBootstrapClass">
+    {{rajuResponseMessage}}
+  </div>
+</div>
+
+<!-- Bootstrap Registration Form -->
+<form [formGroup]="rajuFormGroup" (submit)="onRegisterSubmit()"> 
+  <!-- A name for the form group-->
+
+  <!-- Username Input -->
+  <div class="form-group">
+    <label for="username">Username</label>
+    <div [ngClass]="{
+                  'has-error': (rajuFormGroup.controls.username.errors && rajuFormGroup.controls.username.dirty) 
+                  || (!rajuUsernameValid && rajuFormGroup.controls.username.dirty), 
+                  'has-success': !rajuFormGroup.controls.username.errors && rajuUsernameValid}">
+      <!--here dirty means: user has actually typed something or pressed backspace -->
+      <!-- has-error: a boostrap class which gives red border and red validation message -->
+      <input type="text" name="username" formControlName="username" 
+      class="form-control" autocomplete="off" placeholder="*Username" (blur) = "checkUsernameFunction()"   />
+       <!-- Validation -->
+       <ul class="help-block">
+        <li *ngIf="rajuFormGroup.controls.username.errors?.required && rajuFormGroup.controls.username.dirty">
+          This field is required</li>
+          <!-- *ngIf : because the error msg should be displayed only when validation fails -->
+          <!--?.required indicates, if such a validator exists, if such a validator doesn't exists ignore it -->
+          <li *ngIf="rajuFormGroup.controls.username.errors?.minlength && rajuFormGroup.controls.username.dirty 
+          || rajuFormGroup.controls.username.errors?.maxlength && rajuFormGroup.controls.username.dirty ">
+          Minimum characters: 3, Maximum characters: 20</li>
+          <li *ngIf="rajuFormGroup.controls.username.errors?.validateUsername && rajuFormGroup.controls.username.dirty">
+            Username must not have any special characters</li>  
+          <li *ngIf="rajuUsernameMessage">{{rajuUsernameMessage}}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Email Input -->
+  <div class="form-group">
+    <label for="email">Email</label>
+    <div [ngClass]="{
+      'has-error': (rajuFormGroup.controls.email.errors && rajuFormGroup.controls.email.dirty) 
+      || (!rajuEmailValid && rajuFormGroup.controls.email.dirty), 
+      'has-success': !rajuFormGroup.controls.email.errors && rajuEmailValid}">
+      <input type="text" name="email" formControlName="email"  
+      class="form-control" autocomplete="off" placeholder="*Email" (blur) = "checkEmailFunction()" />
+      <!-- Validation -->
+      <ul class="help-block">
+          <li *ngIf="rajuFormGroup.controls.email.errors?.required && rajuFormGroup.controls.email.dirty">
+            This field is required</li>
+            <li *ngIf="(rajuFormGroup.controls.email.errors?.minlength && rajuFormGroup.controls.email.dirty 
+              || rajuFormGroup.controls.email.errors?.maxlength && rajuFormGroup.controls.email.dirty )">
+              Minimum characters: 5, Maximum characters: 40</li>
+            <li *ngIf="rajuFormGroup.controls.email.errors?.validateEmail && rajuFormGroup.controls.email.dirty">
+              This must be a valid e-mail</li>
+              <li *ngIf="rajuEmailMessage">{{rajuEmailMessage}}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Password Input -->
+  <div class="form-group">
+    <label for="password">Password</label>
+    <div [ngClass]="{
+      'has-error': (rajuFormGroup.controls.password.errors && rajuFormGroup.controls.password.dirty), 
+      'has-success': !rajuFormGroup.controls.password.errors}">
+      <input type="password" name="password" formControlName="password" class="form-control" autocomplete="off" placeholder="*Password" />
+      <!-- Validation -->
+      <ul class="help-block">
+          <li *ngIf="rajuFormGroup.controls.password.errors?.required && rajuFormGroup.controls.password.dirty">
+            This field is required</li>
+            <li *ngIf="rajuFormGroup.controls.password.errors?.minlength && rajuFormGroup.controls.password.dirty 
+            || rajuFormGroup.controls.password.errors?.maxlength && rajuFormGroup.controls.password.dirty ">
+            Minimum characters: 8, Maximum characters: 30</li>
+            <li *ngIf="rajuFormGroup.controls.password.errors?.validatePassword && 
+            rajuFormGroup.controls.password.dirty">
+            Password must have atleast 1 lowercase, 1 uppercase, 1 digit and 1 special character</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Confirm Password Input -->
+  <div class="form-group">
+    <label for="confirm">Confirm Password</label>
+    <div [ngClass]="{'has-error': (rajuFormGroup.controls.confirm.errors && 
+    rajuFormGroup.controls.confirm.dirty) || 
+    (rajuFormGroup.errors?.matchingPasswords && rajuFormGroup.controls.confirm.dirty), 
+    'has-success': !rajuFormGroup.controls.confirm.errors && 
+    !rajuFormGroup.errors?.matchingPasswords}">
+      <input type="password" name="confirm" formControlName="confirm" class="form-control" autocomplete="off" placeholder="*Confirm Password" />
+      <!-- Validation -->
+      <ul class="help-block">
+          <li *ngIf="rajuFormGroup.controls.confirm.errors?.required && rajuFormGroup.controls.confirm.dirty">
+            This field is required</li>
+          <li *ngIf="rajuFormGroup.errors?.matchingPasswords && rajuFormGroup.controls.confirm.dirty">
+            Password do not match</li>
+        </ul>
+    </div>
+  </div>
+
+  <!-- Submit Input -->
+  <input [disabled]="!rajuFormGroup.valid || rajuProcessing || !rajuUsernameValid  || !rajuEmailValid"  type="submit" class="btn btn-primary" value="Submit" />
+
+</form>
+<!-- End of Registration Form -->
+
+<!-- <h3>To Verify Data-binding:</h3>
+<p>Username: {{ rajuFormGroup.controls.username.value }}</p>
+<p>Email: {{ rajuFormGroup.controls.email.value }}</p>
+<p>Password: {{ rajuFormGroup.controls.password.value }}</p>
+<p>Confirm Password: {{ rajuFormGroup.controls.confirm.value }}</p> -->

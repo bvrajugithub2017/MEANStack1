@@ -1,0 +1,46 @@
+<h1 class="page-header">Delete Blog </h1>
+
+<div class="row show-hide-message" *ngIf="rajuResponseMessage">
+    <div [ngClass] = "rajuBootstrapClass">
+        {{rajuResponseMessage}}
+    </div>
+</div>
+
+<div class="col-md-6" *ngIf="foundBlog">
+  <!-- Displaying the blog details which is about to be deleted -->
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{blog.title}}</h3>
+    </div>
+    <div class="panel-body">
+      {{blog.body}}
+    </div>
+    <div class="panel-footer">
+      <strong>Posted by: </strong> {{ blog.createdBy}} 
+      <br/>
+      <strong>Date: </strong> {{ blog.createdAt | date: 'MMM dd, yyyy'}}
+    </div>
+  </div>
+
+  <br/>
+
+  <!-- To display confirm dialog box -->
+  <div class="modal-content">
+    <div class="modal-header">
+        <button type="button" name="button" class="close" data-dismiss="modal">&times;</button>
+      <!-- &times; is HTML 4 Entity to show a Multiplication symbol-->
+      <h4 class="modal-title">Confirm</h4>
+    </div>
+    <div class="modal-body">
+      <p>Are u sure you would like to delete this blog?</p>      
+    </div>
+    <div class="modal-footer">
+      <button [disabled]="processing" type="button" name="button" 
+                  class="btn btn-danger" (click) = "deleteBlog()">Yes</button>
+      <a routerLink="/blog"><button [disabled]="processing" type="button" name="button" 
+                  class="btn btn-info">No</button></a>
+      <!-- When the user clicks "No" just go back -->
+    </div>
+  </div>
+
+</div>

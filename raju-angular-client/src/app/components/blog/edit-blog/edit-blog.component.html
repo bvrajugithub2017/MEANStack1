@@ -1,0 +1,36 @@
+<h1 class="page-header">Edit Blog </h1>
+
+<div class="row show-hide-message" *ngIf="rajuResponseMessage">
+    <div [ngClass] = "rajuBootstrapClass">
+        {{rajuResponseMessage}}
+    </div>
+</div>
+
+
+<form (submit)= "updateBlogSubmit()" *ngIf = "!loading">
+                              <!-- Displaying the form only when loading is done-->
+    <!-- Title Input-->
+    <div class="form-group">
+        <label for="title">Title</label>
+            <input [disabled] = "processing" type="text" name="title" class="form-control"
+             placeholder="*Blog Title" [(ngModel)]="blog.title"/>
+    </div>
+    
+    <!-- Skipping the validation stuff just for the sake of simplicity-->
+
+    <!-- Body Input-->
+     <div class="form-group">
+        <label for="body">Body</label>
+            <textarea [disabled] = "processing" name="body" rows="8" cols="50" class="form-control"
+                placeholder="*Blog Body" [(ngModel)] = "blog.body"></textarea>
+    </div>
+
+    <a [routerLink]= "['/delete-blog/', blog._id]">
+    <button [disabled] = "processing" type="button" name="button" class="btn btn-danger">Delete</button>
+    </a>
+
+     <button [disabled] = "processing" type="button" name="button" (click) = "goBack()" 
+        class="btn btn-warning">Go Back</button>
+    <button [disabled] = "processing" type="submit" 
+            name="button" class="btn btn-info">Save Changes</button> 
+</form>

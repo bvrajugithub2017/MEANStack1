@@ -1,0 +1,191 @@
+<h1 class="page-header">Blog Feed</h1>
+
+<div class="row show-hide-message" *ngIf="rajuResponseMessage && newPost">
+    <div [ngClass]="rajuBootstrapClass">
+        {{rajuResponseMessage}}
+    </div>
+</div>
+
+<button type="button" name="button" class="btn btn-warning" *ngIf="!newPost" (click)="newBlogForm()">New Post</button>
+<!-- If New Post Button is clicked it should be hidden -->
+<button [disabled]="loadingBlogs" type="button" name="button" class="btn btn-default" *ngIf="!newPost" (click)="reloadBlogs()">
+    <span class="glyphicon glyphicon-repeat"></span>&nbsp;&nbsp;Reload</button>
+
+<br/>
+<br/>
+
+<!-- Start of New Blog Form-->
+<form [formGroup]="rajuBlogFormGroup" (submit)="onBlogSubmit()" *ngIf="newPost">
+                                <!-- This condition would be true when the user clicks on the above "New Post" button -->
+
+    <!-- Title Input-->
+    <div class="form-group">
+        <label for="title">Title</label>
+        <div [ngClass]="{'has-success' : rajuBlogFormGroup.controls.title.valid, 
+                            'has-error' : rajuBlogFormGroup.controls.title.dirty 
+                            && rajuBlogFormGroup.controls.title.errors}">
+            <input type="text" name="title" class="form-control" placeholder="*Blog Title" autocomplete="off" formControlName="title"
+            />
+
+            <ul class="help-block">
+                <li *ngIf="rajuBlogFormGroup.controls.title.errors?.required 
+                    && rajuBlogFormGroup.controls.title.dirty">
+                    This field is required</li>
+                <li *ngIf="rajuBlogFormGroup.controls.title.errors?.minlength 
+                            && rajuBlogFormGroup.controls.title.dirty 
+                || rajuBlogFormGroup.controls.title.errors?.maxlength 
+                && rajuBlogFormGroup.controls.title.dirty ">
+                    Minimum characters: 5, Maximum characters: 40</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Body Input-->
+    <div class="form-group">
+        <label for="body">Body</label>
+        <div [ngClass]="{'has-success' : rajuBlogFormGroup.controls.body.valid, 
+                            'has-error' : rajuBlogFormGroup.controls.body.dirty 
+                            && rajuBlogFormGroup.controls.body.errors}">
+            <textarea name="body" rows="8" cols="50" class="form-control" 
+            placeholder="*Blog Body" autocomplete="off" formControlName="body"></textarea>
+
+            <ul class="help-block">
+                <li *ngIf="rajuBlogFormGroup.controls.body.errors?.required 
+                        && rajuBlogFormGroup.controls.body.dirty">
+                    This field is required</li>
+                <li *ngIf="rajuBlogFormGroup.controls.body.errors?.minlength 
+                    && rajuBlogFormGroup.controls.body.dirty 
+                || rajuBlogFormGroup.controls.body.errors?.maxlength 
+                        && rajuBlogFormGroup.controls.body.dirty ">
+                    Minimum characters: 5, Maximum characters: 500</li>
+            </ul>
+        </div>
+    </div>
+
+    <button [disabled]="processing" type="button" name="button" (click)="goBack()" class="btn btn-warning">Go Back</button>
+    <button [disabled]="processing || !rajuBlogFormGroup.valid " type="submit" name="button" class="btn btn-success">Submit</button>
+</form>
+
+<!-- End of New Blog Form-->
+
+<div *ngIf="!newPost">
+    <div class="panel panel-primary" *ngFor="let  oneBlogObject of blogPosts">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ oneBlogObject.title }}</h3>
+        </div>
+        <div class="panel-body">
+            {{oneBlogObject.body}}
+        </div>
+        <div class="panel-footer">
+            <strong>Posted by: </strong> {{ oneBlogObject.createdBy }}
+            <br/>
+            <strong>Date: </strong> {{ oneBlogObject.createdAt | date: 'MMM dd, yyyy' }}
+            <br/>
+            <div *ngIf="blogCreatorName == oneBlogObject.createdBy">
+                <!--if the user logged in is the same one who posted this then hide this -->
+                <strong>Likes: </strong> {{ oneBlogObject.likes }}
+                <br/>
+                <strong>Dislikes: </strong> {{ oneBlogObject.dislikes }}
+            </div>
+            <a [routerLink]="['/edit-blog/', oneBlogObject._id]" *ngIf="blogCreatorName == oneBlogObject.createdBy">
+                <button type="button" name="button" class="btn btn-sm btn-info">Edit</button>
+            </a>
+            <a [routerLink]="['/delete-blog/', oneBlogObject._id]" *ngIf="blogCreatorName == oneBlogObject.createdBy">
+                <button type="button" name="button" class="btn btn-sm btn-danger">Delete</button>
+            </a>
+            <!-- Note: for own posts, likes and Dislikes button should not be shown-->
+            <!-- Likes Dropdown-->
+            <div class="dropdown">
+                <!-- this CSS class is downloaded from w3schools-->
+                <button [disabled]="oneBlogObject.likedBy.indexOf(username) != -1" type="button" name="button" class="btn btn-sm btn-success"
+                    *ngIf="blogCreatorName != oneBlogObject.createdBy" (click)="likeBlog(oneBlogObject._id)">
+                    <!-- they he/she didn't posted it only then he/she can view it-->
+                    <span class="glyphicon glyphicon-thumbs-up">&nbsp;</span>Likes: {{ oneBlogObject.likes }}</button>
+                <!-- List of people who liked this blog post-->
+                <div class="dropdown-content">
+                    <a [routerLink]="['/user/', liker]" *ngFor="let liker of oneBlogObject.likedBy">{{ liker }}</a>
+                </div>
+            </div>
+
+            <!-- Dislikes Dropdown-->
+            <div class="dropdown">
+                <button [disabled]="oneBlogObject.disLikedBy.indexOf(username) != -1" type="button" name="button" class="btn btn-sm btn-warning"
+                    *ngIf="blogCreatorName != oneBlogObject.createdBy" (click)="disLikeBlog(oneBlogObject._id)">
+                    <!-- they he/she didn't posted it only then he/she can view it-->
+                    <span class="glyphicon glyphicon-thumbs-down">&nbsp;</span>Dislikes: {{ oneBlogObject.disLikes }}</button>
+                <!-- List of people who disliked this blog post-->
+                <div class="dropdown-content">
+                    <a [routerLink]="['/user/', disliker]" *ngFor="let disLiker of oneBlogObject.disLikedBy">{{ disLiker }}</a>
+                </div>
+            </div>
+        </div>
+        <!-- End of Footer-->
+
+        <!-- Post COMMENT Box starts here -->
+        <ul class="list-group">
+            <li class="list-group-item">
+                <!-- To show the Post Comment Form -->
+                <button type="button" name="button" (click)="draftComment(oneBlogObject._id)" 
+                    [disabled]="newCommentArr.indexOf(oneBlogObject._id) > -1"
+                    class="btn btn-sm btn-danger" *ngIf="blogCreatorName != oneBlogObject.createdBy">
+                    Post Comment</button>
+                <!-- To disable the button if already clicked -->
+                <br/>
+                <br/>
+                <div *ngIf="newCommentArr.indexOf(oneBlogObject._id) > -1">
+                    <form [formGroup]="commentForm">
+                        <div [ngClass]= "{'has-success' : !commentForm.controls.comment.errors 
+                            && commentForm.controls.comment.dirty, 
+                            'has-error' : commentForm.controls.comment.dirty 
+                            && commentForm.controls.comment.errors}">
+                            <textarea name="comment" formControlName="comment" rows="10" cols="50" 
+                                    class="form-control"></textarea>    
+                            <!-- Validation -->
+                            <ul class="help-block">
+                                    <li *ngIf="commentForm.controls.comment.errors?.required 
+                                            && commentForm.controls.comment.dirty">
+                                        This field is required</li>
+                                    <li *ngIf="commentForm.controls.comment.errors?.minlength 
+                                        && commentForm.controls.comment.dirty 
+                                    || commentForm.controls.comment.errors?.maxlength 
+                                            && commentForm.controls.comment.dirty ">
+                                        Minimum characters: 2, Maximum characters: 150</li>
+                            </ul>
+                        </div>
+                        <!-- Disable the button if the form is not valid -->
+                        <button [disabled]="!commentForm.valid || rajuProcessing" type="submit" 
+                        name="button" (click)="postComment(oneBlogObject._id)"
+                            class="btn btn-sm btn-info">Submit Comment</button>
+                        <button [disabled]="rajuProcessing" type="button" name="button" 
+                        (click)="cancelSubmission(oneBlogObject._id)" class="btn btn-sm btn-danger">Cancel</button>
+                    </form>
+                </div>
+            </li>
+            <!-- Show Comments -->
+            <li *ngIf="enabledCommentsArr.indexOf(oneBlogObject._id) == -1 
+            && oneBlogObject.comments.length > 0" class="list-group-item">
+                <span (click)="expand(oneBlogObject._id)">
+                    Show comments&nbsp;&nbsp; <div class="glyphicon glyphicon-comment"></div>
+                </span>
+            </li>
+
+            <!-- Hide Comments -->
+            <li *ngIf="enabledCommentsArr.indexOf(oneBlogObject._id) > -1" class="list-group-item">
+                <span (click)="collapse(oneBlogObject._id)">
+                    Hide Comments&nbsp;&nbsp; <div class="glyphicon glyphicon-comment"></div>
+                </span>
+            </li>
+
+            <!-- Comment -->
+            <div *ngIf="enabledCommentsArr.indexOf(oneBlogObject._id) > -1">
+                <li *ngFor="let c of oneBlogObject.comments" class="list-group-item">
+                    <strong>{{ c.commentator }}:</strong> {{ c.comment }}
+                </li>
+            </div>
+
+        </ul>
+        <!-- Post COMMENT Box Ends here -->
+    </div>
+    <!--End of <div class="panel panel-primary"> -->
+</div>
+<!-- End of  <div *ngIf="!newPost">  -->
